@@ -1,0 +1,1084 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mural da Paz</title>
+    <style>
+        @font-face {
+            font-family: 'Poppins';
+            src: url('assets/fonts/Poppins.ttf');
+        }
+
+        * {
+            border: none;
+            box-sizing: border-box;
+            margin: 0;
+            font-family: Century Gothic, 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #ffffff;
+            min-height: 100vh;
+            width: 100vw;
+            display: flex;
+            flex-direction: column;
+            transition: opacity 0.5s ease-in-out;
+            color: #333;
+        }
+
+        h1, h2 {
+            font-family: 'Poppins', sans-serif;
+            color: #333;
+        }
+
+        /* Classes para navegação e visibilidade */
+        .hidden {
+            display: none !important;
+        }
+
+        .fade-out {
+            opacity: 0;
+        }
+
+        .fade-in {
+            opacity: 1;
+        }
+
+        /* Estilos do cabeçalho */
+        header {
+            width: 100vw;
+            height: 100px;
+            background-color: black;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
+        }
+
+        #header-left {
+            display: flex;
+            align-items: center;
+        }
+
+        #header-left h1 {
+            color: white;
+        }
+
+        #menu-button {
+            cursor: pointer;
+        }
+
+        #menu-button img {
+            height: 25px;
+            width: 30px;
+        }
+
+        /* Estilos do Menu de Navegação (Sidebar) - AGORA COM ESTILO MAIS NEUTRO */
+        .nav-menu-overlay {
+            position: fixed;
+            top: 0;
+            right: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: flex-end;
+            z-index: 100;
+            transition: visibility 0.5s;
+        }
+
+        .nav-menu-overlay.hidden {
+            visibility: hidden;
+        }
+
+        .nav-menu-content {
+            width: 300px;
+            background-color: #f4f4f4; /* Fundo neutro */
+            padding: 40px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2rem;
+            transform: translateX(100%);
+            transition: transform 0.5s ease-in-out;
+            position: relative;
+        }
+
+        .nav-menu-overlay.active .nav-menu-content {
+            transform: translateX(0);
+        }
+
+        .nav-menu-content a, .nav-menu-content p {
+            font-size: 1.5rem;
+            color: #333; /* Cor de texto escura */
+            text-decoration: none;
+            transition: color 0.3s;
+            cursor: pointer;
+        }
+
+        .nav-menu-content a:hover, .nav-menu-content p:hover {
+            color: #ffc107;
+        }
+
+        .nav-menu-content #close-menu-button {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 3rem;
+            cursor: pointer;
+            color: #333; /* Cor de texto escura */
+            transition: transform 0.3s;
+        }
+
+        .nav-menu-content #close-menu-button:hover {
+            transform: scale(1.2);
+        }
+
+        /* Estilos do Modal de Login/Cadastro */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 101;
+        }
+
+        .login-cadastro-modal {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            width: 90%;
+            max-width: 400px;
+            color: #333;
+            text-align: center;
+        }
+
+        .login-cadastro-modal h3 {
+            font-size: 2rem;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .login-cadastro-modal input, .login-cadastro-modal select {
+            width: 100%;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            background-color: #f0f4f8;
+            color: #333;
+            border: 1px solid #ccc;
+        }
+
+        .login-cadastro-modal button {
+            width: 100%;
+            padding: 15px;
+            border-radius: 10px;
+            background-color: #333;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .login-cadastro-modal button:hover {
+            background-color: #555;
+        }
+
+        .close-modal {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            font-size: 2rem;
+            color: #333;
+            cursor: pointer;
+        }
+
+        .switch-form {
+            margin-top: 15px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            color: #666;
+        }
+        .switch-form:hover {
+            text-decoration: underline;
+        }
+        
+        /* Estilos para o botão de mostrar senha */
+        .password-container {
+            position: relative;
+        }
+
+        .toggle-password {
+            position: absolute;
+            right: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #666;
+            font-size: 1.2rem;
+        }
+
+        /* Estilos da página principal (mural) */
+        main {
+            width: 100vw;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            padding: 20px;
+        }
+
+        .card {
+            min-height: 400px;
+            max-height: 400px;
+            padding: 20px;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column-reverse;
+            justify-content: space-between;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .card:hover {
+            transform: scale(1.03);
+            box-shadow: 0 8px 15px rgba(0,0,0,0.2);
+        }
+
+        .card > img, .card > video {
+            width: 100%;
+            height: 80%;
+            object-fit: cover;
+            border-radius: 15px;
+        }
+
+        .title-arrow-container {
+            margin-top: 10px;
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .title-container {
+            text-align: left;
+        }
+
+        .title-container h2, .title-container p {
+            color: white;
+        }
+
+        .arrow-container img {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* Adicionado estilo para girar a seta de voltar */
+        .back-arrow.rotated {
+            transform: rotate(180deg);
+        }
+
+        /* Classes para tamanhos variados usando grid-column */
+        .card-small {
+            grid-column: span 2;
+        }
+
+        .card-large {
+            grid-column: span 1;
+        }
+
+        .card-extra-large {
+            grid-column: span 3;
+        }
+
+        /* Cores primárias e secundárias */
+        .card-red {
+            background-color: #e74c3c;
+        }
+        .card-blue {
+            background-color: #3498db;
+        }
+        .card-yellow {
+            background-color: #f1c40f;
+        }
+        .card-green {
+            background-color: #2ecc71;
+        }
+        .card-orange {
+            background-color: #e67e22;
+        }
+        .card-purple {
+            background-color: #9b59b6;
+        }
+        .card-cyan {
+            background-color: #00bcd4;
+        }
+
+
+        /* Estilos da tela do card aberto */
+        #card-view-page {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #FFFFFF; /* Fundo branco para a página do card aberto */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 99;
+        }
+        #card-view {
+            width: 90vw; /* Ocupa 90% da largura do viewport */
+            height: 90vh; /* Ocupa 90% da altura do viewport */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0; /* Padding removido do container externo */
+            box-sizing: border-box; /* Garante que o padding não adicione largura e altura */
+        }
+        .card-view-content {
+            background-color: #e74c3c;
+            border-radius: 20px;
+            padding: 40px; /* Padding interno dobrado para 40px */
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            width: 100%;
+            height: 100%;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+            position: relative;
+            /* Esconde a barra de rolagem, mas permite a rolagem */
+            overflow-y: scroll;
+            -ms-overflow-style: none;  /* IE and Edge */
+            scrollbar-width: none;  /* Firefox */
+        }
+
+        /* Esconde a barra de rolagem no WebKit (Chrome, Safari) */
+        .card-view-content::-webkit-scrollbar {
+            display: none;
+        }
+        
+        /* Layout específico para imagem e texto lado a lado */
+        .image-text-container {
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            align-items: flex-start;
+        }
+        
+        .image-text-container img {
+            width: 40%;
+            object-fit: contain;
+            border-radius: 15px;
+        }
+        
+        .image-text-container p {
+            flex-grow: 1;
+        }
+
+        /* Estilo do botão de like */
+        #like-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 2rem;
+            cursor: pointer;
+            color: white;
+            transition: transform 0.3s;
+        }
+        #like-button.liked {
+            color: #e74c3c;
+        }
+
+        .card-view-content * {
+            color: white;
+        }
+
+        #card-view-header {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        #card-view-header .back-arrow {
+            width: 40px;
+            height: 40px;
+            cursor: pointer;
+            transition: transform 0.3s;
+        }
+
+        #card-view-header .back-arrow:hover {
+            transform: scale(1.2);
+        }
+
+        #card-view-header h2 {
+            font-size: 2.5rem;
+            margin: 0;
+            line-height: 1;
+        }
+
+        #card-media {
+            width: 100%;
+            height: auto;
+            border-radius: 15px;
+            border: 5px solid white;
+            object-fit: cover;
+        }
+
+        #card-text {
+            white-space: pre-wrap;
+            font-size: 1.2rem;
+            line-height: 1.6;
+        }
+
+        /* Media query para responsividade em telas menores que 768px (móvel). */
+        @media (max-width: 768px) {
+            header {
+                padding: 0 20px;
+            }
+
+            main {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                padding: 10px;
+            }
+
+            .card {
+                width: 90vw;
+                height: auto;
+                margin: 10px 0;
+            }
+
+            .card-small, .card-large, .card-extra-large {
+                width: 90vw;
+                grid-column: span 1;
+            }
+
+            #card-view {
+                padding: 20px;
+                width: 100vw;
+                height: 100vh;
+            }
+
+            .card-view-content {
+                padding: 20px;
+            }
+
+            #card-view-header h2 {
+                font-size: 1.8rem;
+            }
+
+            #card-text {
+                font-size: 1rem;
+            }
+
+            .nav-menu-content {
+                width: 70%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Página principal do Mural -->
+    <div id="mural-page" class="fade-in">
+        <header>
+            <div id="header-left">
+                <h1>Mural da Paz</h1>
+            </div>
+            <div id="menu-button">
+                <img src="assets/menu.png" alt="Menu">
+            </div>
+        </header>
+        <main>
+            <!-- Card 1 - Poema -->
+            <div class="card card-large card-red" id="card-poema">
+                <div class="title-arrow-container">
+                    <div class="title-container">
+                        <h2>Poema Pela Paz</h2>
+                        <p>
+                            By Yolanda Duarte
+                        </p>
+                    </div>
+                    <div class="arrow-container">
+                        <img src="assets/arrow.webp" alt="Ver mais">
+                    </div>
+                </div>
+                <img src="assets/card1.jpg" onerror="this.onerror=null;this.src='https://placehold.co/800x600/e74c3c/FFFFFF';" alt="Arte 1">
+            </div>
+
+            <!-- Card 2 - Vídeo -->
+            <div class="card card-small card-blue" id="card-video">
+                <div class="title-arrow-container">
+                    <div class="title-container">
+                        <h2>Uma Luta Pela Pele</h2>
+                        <p>
+                            By Matheus Ibiapino
+                        </p>
+                    </div>
+                    <div class="arrow-container">
+                        <img src="assets/arrow.webp" alt="Ver mais">
+                    </div>
+                </div>
+                <img src="assets/card2.png" onerror="this.onerror=null;this.src='https://placehold.co/800x600/3498db/FFFFFF';" alt="Vídeo">
+            </div>
+
+            <!-- Card 3 - Texto -->
+            <div class="card card-large card-yellow" id="card-texto1">
+                <div class="title-arrow-container">
+                    <div class="title-container">
+                        <h2>A Ponte da Paz</h2>
+                        <p>
+                            By Sofia Alves
+                        </p>
+                    </div>
+                    <div class="arrow-container">
+                        <img src="assets/arrow.webp" alt="Ver mais">
+                    </div>
+                </div>
+                <!-- <img src="assets/card3.png" onerror="this.onerror=null;this.src='https://placehold.co/800x600/f1c40f/FFFFFF';" alt="Arte 3"> -->
+            </div>
+
+            <!-- Card 4 - Vídeo -->
+            <div class="card card-small card-purple" id="card-video2">
+                <div class="title-arrow-container">
+                    <div class="title-container">
+                        <h2>O Jardim da Harmonia</h2>
+                        <p>
+                            By Lucas Pereira
+                        </p>
+                    </div>
+                    <div class="arrow-container">
+                        <img src="assets/arrow.webp" alt="Ver mais">
+                    </div>
+                </div>
+                <!-- <img src="assets/card4.png" onerror="this.onerror=null;this.src='https://placehold.co/800x600/9b59b6/FFFFFF';" alt="Arte 4"> -->
+            </div>
+
+            <!-- Card 5 - Texto -->
+            <div class="card card-large card-orange" id="card-texto2">
+                <div class="title-arrow-container">
+                    <div class="title-container">
+                        <h2>União</h2>
+                        <p>
+                            By Ana Clara Lima
+                        </p>
+                    </div>
+                    <div class="arrow-container">
+                        <img src="assets/arrow.webp" alt="Ver mais">
+                    </div>
+                </div>
+                <!-- <img src="assets/card5.png" onerror="this.onerror=null;this.src='https://placehold.co/800x600/e67e22/FFFFFF';" alt="Arte 5"> -->
+            </div>
+
+            <!-- Card 6 - Texto -->
+            <div class="card card-large card-green" id="card-texto3">
+                <div class="title-arrow-container">
+                    <div class="title-container">
+                        <h2>Nossa Terra</h2>
+                        <p>
+                            By Rafael Souza
+                        </p>
+                    </div>
+                    <div class="arrow-container">
+                        <img src="assets/arrow.webp" alt="Ver mais">
+                    </div>
+                </div>
+                <!-- <img src="assets/card6.png" onerror="this.onerror=null;this.src='https://placehold.co/800x600/2ecc71/FFFFFF';" alt="Arte 6"> -->
+            </div>
+
+            <!-- Card 7 - Texto -->
+            <div class="card card-large card-red" id="card-texto4">
+                <div class="title-arrow-container">
+                    <div class="title-container">
+                        <h2>Liberdade</h2>
+                        <p>
+                            By Clara Borges
+                        </p>
+                    </div>
+                    <div class="arrow-container">
+                        <img src="assets/arrow.webp" alt="Ver mais">
+                    </div>
+                </div>
+                <!-- <img src="assets/card7.png" onerror="this.onerror=null;this.src='https://placehold.co/800x600/e74c3c/FFFFFF';" alt="Arte 7"> -->
+            </div>
+
+            <!-- Card 8 - Texto (Novo) -->
+            <div class="card card-small card-cyan" id="card-texto5">
+                <div class="title-arrow-container">
+                    <div class="title-container">
+                        <h2>Empatia</h2>
+                        <p>
+                            By João Silveira
+                        </p>
+                    </div>
+                    <div class="arrow-container">
+                        <img src="assets/arrow.webp" alt="Ver mais">
+                    </div>
+                </div>
+                <!-- <img src="https://placehold.co/800x600/00bcd4/FFFFFF" onerror="this.onerror=null;this.src='https://placehold.co/800x600/00bcd4/FFFFFF';" alt="Arte 8"> -->
+            </div>
+        </main>
+    </div>
+
+    <!-- Tela para visualizar o card (inicialmente oculta) -->
+    <div id="card-view-page" class="hidden fade-out">
+        <div id="card-view">
+            <div id="card-view-content" class="card-view-content" style="background-color: #e74c3c;">
+                <!-- O conteúdo é injetado dinamicamente aqui -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Login/Cadastro -->
+    <div id="login-cadastro-modal-overlay" class="modal-overlay hidden">
+        <div class="login-cadastro-modal">
+            <span id="close-modal-button" class="close-modal">&times;</span>
+
+            <!-- Formulário de Login -->
+            <div id="login-form-container">
+                <h3>Login</h3>
+                <form id="login-form">
+                    <input type="text" id="login-username" placeholder="Usuário" required>
+                    <div class="password-container">
+                        <input type="password" id="login-password" placeholder="Senha" required>
+                        <span class="toggle-password" data-target="login-password">👀</span>
+                    </div>
+                    <button type="submit">Entrar</button>
+                    <p id="show-cadastro-link" class="switch-form">
+                        Ainda não tem uma conta? Cadastre-se
+                    </p>
+                </form>
+            </div>
+
+            <!-- Formulário de Cadastro (inicialmente oculto) -->
+            <div id="cadastro-form-container" class="hidden">
+                <h3>Cadastro</h3>
+                <form id="cadastro-form">
+                    <input type="text" id="cadastro-username" placeholder="Usuário" required>
+                    <div class="password-container">
+                        <input type="password" id="cadastro-password" placeholder="Senha" required>
+                        <span class="toggle-password" data-target="cadastro-password">👀</span>
+                    </div>
+                    <div class="password-container">
+                        <input type="password" id="cadastro-password-confirm" placeholder="Confirme a senha" required>
+                        <span class="toggle-password" data-target="cadastro-password-confirm">👀</span>
+                    </div>
+                    <select id="cadastro-turma" required>
+                        <option value="" disabled selected>Selecione sua turma</option>
+                        <option value="3º ano de Informática">3º ano de Informática</option>
+                        <option value="3º ano de Análises Clínicas">3º ano de Análises Clínicas</option>
+                        <option value="3º ano de Serviços Jurídicos">3º ano de Serviços Jurídicos</option>
+                        <option value="1º ano de Jogos Digitais">1º ano de Jogos Digitais</option>
+                        <option value="2º ano de Jogos Digitais">2º ano de Jogos Digitais</option>
+                        <option value="3º ano de Enfermagem">3º ano de Enfermagem</option>
+                    </select>
+                    <button type="submit">Cadastrar</button>
+                    <p id="show-login-link" class="switch-form">
+                        Já tem uma conta? Faça login
+                    </p>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Menu de Navegação (inicialmente oculto) -->
+    <div id="nav-menu-overlay" class="nav-menu-overlay hidden">
+        <div class="nav-menu-content">
+            <span id="close-menu-button">&times;</span>
+            <p>
+                Sobre nós
+            </p>
+            <a href="https://wa.me/5511957970304" target="_blank">Envie Sua Arte!</a>
+            <p>
+                Feedback
+            </p>
+            <p id="login-text">
+                Login
+            </p>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const muralPage = document.getElementById('mural-page');
+            const cardViewPage = document.getElementById('card-view-page');
+            const cards = document.querySelectorAll('.card');
+            const cardViewContent = document.getElementById('card-view-content');
+
+            // Elementos do novo menu de navegação
+            const menuButton = document.getElementById('menu-button');
+            const navMenuOverlay = document.getElementById('nav-menu-overlay');
+            const closeMenuButton = document.getElementById('close-menu-button');
+            const loginText = document.getElementById('login-text');
+
+            // Elementos do modal de Login/Cadastro
+            const loginCadastroModalOverlay = document.getElementById('login-cadastro-modal-overlay');
+            const closeLoginCadastroButton = document.getElementById('close-modal-button');
+            const loginFormContainer = document.getElementById('login-form-container');
+            const cadastroFormContainer = document.getElementById('cadastro-form-container');
+            const showCadastroLink = document.getElementById('show-cadastro-link');
+            const showLoginLink = document.getElementById('show-login-link');
+            const loginForm = document.getElementById('login-form');
+            const cadastroForm = document.getElementById('cadastro-form');
+            const togglePasswordButtons = document.querySelectorAll('.toggle-password');
+
+            // Dados dos cards para carregamento dinâmico
+            const cardData = {
+                'card-poema': {
+                    title: 'Poema Pela Paz',
+                    author: 'Yolanda Duarte',
+                    background: '#e74c3c',
+                    type: 'text_with_image',
+                    media: 'assets/card1.jpg',
+                    text: `
+A paz é a leve brisa que acaricia,
+Um eco de silêncio que o medo silencia.
+Não é ausência de luta, mas a arte de acalmar,
+Onde a guerra do peito decide não mais lutar.
+É a mão que se estende, um abraço sem razão,
+O riso sincero que brota do coração.
+A paz é o perdão que ilumina a escuridão,
+Onde cada um compreende a sua imperfeição.
+É a dança das cores em um céu de fim de dia,
+A voz que canta em união, em perfeita melodia.
+A paz é o jardim que a alma decide plantar,
+Com sementes de esperança, para o futuro brotar.`
+                },
+                'card-video': {
+                    title: 'Uma Luta Pela Pele',
+                    author: 'Matheus Ibiapino',
+                    background: '#3498db',
+                    type: 'video',
+                    media: 'assets/racismo.mp4',
+                    text: ''
+                },
+                'card-texto1': {
+                    title: 'A Ponte da Paz',
+                    author: 'Sofia Alves',
+                    background: '#f1c40f',
+                    type: 'text',
+                    media: 'assets/card3.png',
+                    text: `Uma ponte de cores, onde a diferença se torna um elo.
+A ponte não tem lado, não tem medo de se partir,
+Ela une as margens da vida, para que possamos sorrir.
+Feita de fios de esperança, tecida com amor e perdão,
+Ela nos leva a um futuro, de paz e união.`
+                },
+                'card-video2': {
+                    title: 'O Jardim da Harmonia',
+                    author: 'Lucas Pereira',
+                    background: '#9b59b6',
+                    type: 'video',
+                    media: 'assets/racismo.mp4',
+                    text: ''
+                },
+                'card-texto2': {
+                    title: 'União',
+                    author: 'Ana Clara Lima',
+                    background: '#e67e22',
+                    type: 'text',
+                    media: 'assets/card5.png',
+                    text: `União não é ser igual, mas ser um só coração.
+É a melodia de muitas vozes que se tornam canção.
+É o abraço que acolhe, o olhar que não julga,
+É a força do povo que a paz conjuga.`
+                },
+                'card-texto3': {
+                    title: 'Nossa Terra',
+                    author: 'Rafael Souza',
+                    background: '#2ecc71',
+                    type: 'text',
+                    media: 'assets/card6.png',
+                    text: `Nossa terra é um poema, escrito em verde e azul.
+Onde o sol se põe, o silêncio faz-se um sussurro.
+As montanhas são gigantes que guardam a paz.
+O rio que corre é a certeza de que a vida se refaz.`
+                },
+                'card-texto4': {
+                    title: 'Liberdade',
+                    author: 'Clara Borges',
+                    background: '#e74c3c',
+                    type: 'text',
+                    media: 'assets/card7.png',
+                    text: `Liberdade não é voar, mas saber que se pode ir além.
+É a certeza de que somos nós, de que somos também.
+É a alma sem grilhões, o pensamento sem medo,
+É a paz que nos leva para um novo segredo.`
+                },
+                'card-texto5': {
+                    title: 'Empatia',
+                    author: 'João Silveira',
+                    background: '#00bcd4',
+                    type: 'text',
+                    media: 'assets/card8.png',
+                    text: `O espelho da alma é a empatia.
+Ela reflete o que o outro sente,
+E no reflexo encontramos uma amizade
+Que nos torna humanos e mais do que gente.`
+                }
+            };
+
+            // Funções auxiliares para manipulação do localStorage
+            function getUsers() {
+                try {
+                    return JSON.parse(localStorage.getItem('users')) || {};
+                } catch (e) {
+                    console.error("Erro ao carregar dados de usuários do localStorage:", e);
+                    return {};
+                }
+            }
+
+            function saveUsers(users) {
+                localStorage.setItem('users', JSON.stringify(users));
+            }
+
+            // Funções para navegação e UI
+            function renderCardView(cardId) {
+                const data = cardData[cardId];
+                cardViewContent.innerHTML = '';
+                cardViewContent.style.backgroundColor = data.background;
+
+                const headerHtml = `
+                <div id="card-view-header">
+                    <img id="back-arrow" class="back-arrow rotated" src="assets/arrow.webp" alt="Voltar">
+                    <div class="title-container">
+                        <h2>${data.title}</h2>
+                        <p>By ${data.author}</p>
+                    </div>
+                </div>
+                <div id="like-button">🤍</div>
+                `;
+
+                let mediaAndTextHtml = '';
+
+                if (data.type === 'text_with_image') {
+                    mediaAndTextHtml = `
+                    <div class="image-text-container">
+                        <img src="${data.media}" alt="${data.title}">
+                        <pre style="flex-grow: 1; text-align: left; white-space: pre-wrap;">${data.text}</pre>
+                    </div>
+                    `;
+                } else if (data.type === 'video') {
+                    mediaAndTextHtml = `<video id="card-media" controls autoplay class="card-view-image" src="${data.media}"></video>`;
+                    mediaAndTextHtml += data.text ? `<p id="card-text" class="card-view-text">${data.text}</p>` : '';
+                } else {
+                    mediaAndTextHtml = `<img id="card-media" class="card-view-image" src="${data.media}" alt="${data.title}">`;
+                    mediaAndTextHtml += data.text ? `<p id="card-text" class="card-view-text">${data.text}</p>` : '';
+                }
+
+                cardViewContent.innerHTML = headerHtml + mediaAndTextHtml;
+                document.getElementById('back-arrow').addEventListener('click', showMural);
+
+                const likeButton = document.getElementById('like-button');
+                let isLiked = false;
+                likeButton.addEventListener('click', () => {
+                    isLiked = !isLiked;
+                    if (isLiked) {
+                        likeButton.textContent = '❤️';
+                        showModalMessage('Você curtiu este card!', 1500);
+                    } else {
+                        likeButton.textContent = '🤍';
+                        showModalMessage('Você descurtiu este card.', 1500);
+                    }
+                });
+            }
+
+            function showCardView(cardId) {
+                muralPage.classList.add('fade-out');
+                setTimeout(() => {
+                    muralPage.classList.add('hidden');
+                    renderCardView(cardId);
+                    cardViewPage.classList.remove('hidden');
+                    cardViewPage.classList.add('fade-in');
+                }, 500);
+            }
+
+            function showMural() {
+                cardViewPage.classList.add('fade-out');
+                setTimeout(() => {
+                    cardViewPage.classList.add('hidden');
+                    muralPage.classList.remove('hidden');
+                    muralPage.classList.add('fade-in');
+                }, 500);
+            }
+
+            function updateLoginStatus() {
+                if (localStorage.getItem('loggedIn') === 'true') {
+                    loginText.textContent = 'Sair';
+                    loginText.onclick = handleLogout;
+                } else {
+                    loginText.textContent = 'Login';
+                    loginText.onclick = handleLoginClick;
+                }
+            }
+
+            function handleLoginClick() {
+                loginCadastroModalOverlay.classList.remove('hidden');
+                navMenuOverlay.classList.add('hidden');
+                loginFormContainer.classList.remove('hidden');
+                cadastroFormContainer.classList.add('hidden');
+            }
+
+            function handleLogout() {
+                localStorage.removeItem('loggedIn');
+                showModalMessage('Você saiu com sucesso!', 1500);
+                updateLoginStatus();
+                setTimeout(() => {
+                    window.location.reload();
+                }, 1000);
+            }
+
+            function showModalMessage(message, timeout) {
+                const existingModal = document.querySelector('.message-modal-overlay');
+                if (existingModal) {
+                    existingModal.remove();
+                }
+
+                const modalHtml = `
+                    <div class="message-modal-overlay modal-overlay">
+                        <div class="message-modal login-cadastro-modal">
+                            <p>${message}</p>
+                            <button id="close-message-modal">OK</button>
+                        </div>
+                    </div>
+                `;
+                document.body.insertAdjacentHTML('beforeend', modalHtml);
+
+                const messageModalOverlay = document.querySelector('.message-modal-overlay');
+                const closeMessageButton = document.getElementById('close-message-modal');
+                
+                closeMessageButton.addEventListener('click', () => {
+                    messageModalOverlay.remove();
+                });
+
+                if (timeout) {
+                    setTimeout(() => {
+                        messageModalOverlay.remove();
+                    }, timeout);
+                }
+            }
+            
+            // --- LÓGICA DE LOGIN E CADASTRO (com login universal) ---
+            loginForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                localStorage.setItem('loggedIn', 'true');
+                showModalMessage('Login realizado com sucesso!', 1500);
+                loginCadastroModalOverlay.classList.add('hidden');
+                updateLoginStatus();
+            });
+
+            cadastroForm.addEventListener('submit', (event) => {
+                event.preventDefault();
+                const newUsername = document.getElementById('cadastro-username').value.trim();
+                const newPassword = document.getElementById('cadastro-password').value.trim();
+                const confirmPassword = document.getElementById('cadastro-password-confirm').value.trim();
+                const newTurma = document.getElementById('cadastro-turma').value;
+                const users = getUsers();
+
+                if (!newUsername || !newPassword || !confirmPassword || !newTurma) {
+                    showModalMessage('Por favor, preencha todos os campos.');
+                    return;
+                }
+
+                if (newPassword !== confirmPassword) {
+                    showModalMessage('As senhas não coincidem!');
+                    return;
+                }
+
+                if (users.hasOwnProperty(newUsername)) {
+                    showModalMessage('Este nome de usuário já existe. Por favor, escolha outro.');
+                    return;
+                }
+
+                users[newUsername] = { password: newPassword, turma: newTurma };
+                saveUsers(users);
+                showModalMessage('Cadastro realizado com sucesso! Agora faça o login.', 1500);
+
+                loginFormContainer.classList.remove('hidden');
+                cadastroFormContainer.classList.add('hidden');
+            });
+            // --- FIM DA LÓGICA DE LOGIN E CADASTRO ---
+
+            // Lógica do botão de mostrar senha
+            togglePasswordButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    const targetId = button.getAttribute('data-target');
+                    const targetInput = document.getElementById(targetId);
+                    if (targetInput.type === 'password') {
+                        targetInput.type = 'text';
+                        button.textContent = '🙈';
+                    } else {
+                        targetInput.type = 'password';
+                        button.textContent = '👀';
+                    }
+                });
+            });
+
+            // Event listeners para navegação e modais
+            cards.forEach(card => {
+                card.addEventListener('click', () => {
+                    showCardView(card.id);
+                });
+            });
+
+            closeLoginCadastroButton.addEventListener('click', () => {
+                loginCadastroModalOverlay.classList.add('hidden');
+            });
+
+            showCadastroLink.addEventListener('click', () => {
+                loginFormContainer.classList.add('hidden');
+                cadastroFormContainer.classList.remove('hidden');
+            });
+
+            showLoginLink.addEventListener('click', () => {
+                cadastroFormContainer.classList.add('hidden');
+                loginFormContainer.classList.remove('hidden');
+            });
+
+            menuButton.addEventListener('click', () => {
+                navMenuOverlay.classList.remove('hidden');
+                setTimeout(() => {
+                    navMenuOverlay.classList.add('active');
+                }, 10);
+            });
+
+            closeMenuButton.addEventListener('click', () => {
+                navMenuOverlay.classList.remove('active');
+                setTimeout(() => {
+                    navMenuOverlay.classList.add('hidden');
+                }, 500);
+            });
+                
+            navMenuOverlay.addEventListener('click', (event) => {
+                if (event.target === navMenuOverlay) {
+                    navMenuOverlay.classList.remove('active');
+                    setTimeout(() => {
+                        navMenuOverlay.classList.add('hidden');
+                    }, 500);
+                }
+            });
+
+            loginCadastroModalOverlay.addEventListener('click', (event) => {
+                if (event.target === loginCadastroModalOverlay) {
+                    loginCadastroModalOverlay.classList.add('hidden');
+                }
+            });
+
+            updateLoginStatus();
+        });
+    </script>
+</body>
+</html>
